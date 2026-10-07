@@ -11,9 +11,9 @@ func TestLCS(t *testing.T) {
 		name   string
 		inputA []string
 		inputB []string
-		want   []edit.EditNode
+		want   []edit.Node
 	}{
-		{name: "Placeholder", inputA: []string{"a", "b", "c"}, inputB: []string{}, want: []edit.EditNode{
+		{name: "Placeholder", inputA: []string{"a", "b", "c"}, inputB: []string{}, want: []edit.Node{
 			{Content: "a", Op: edit.Remove},
 			{Content: "b", Op: edit.Remove},
 			{Content: "c", Op: edit.Remove}}},

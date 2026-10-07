@@ -7,13 +7,13 @@ import (
 func TestLineOperationString(t *testing.T) {
 	tests := []struct {
 		name string
-		in   EditOp
+		in   Op
 		want string
 	}{
 		{name: "NoChange", in: NoChange, want: "NoChange"},
 		{name: "Add", in: Add, want: "Add"},
 		{name: "Remove", in: Remove, want: "Remove"},
-		{name: "Default", in: EditOp(12), want: "Unknown LineOperation(12)"},
+		{name: "Default", in: Op(12), want: "Unknown LineOperation(12)"},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
