@@ -14,6 +14,7 @@ LDFLAGS     := -s -w -X main.version=$(VERSION)
 
 GO          ?= go
 GOFLAGS     ?=
+RUN			?= .
 
 .DEFAULT_GOAL := help
 
@@ -35,7 +36,7 @@ run: build ## Build and run; pass arguments with ARGS="a.txt b.txt"
 
 .PHONY: test
 test: ## Run unit tests with the race detector
-	$(GO) test $(GOFLAGS) -race -count=1 ./...
+	$(GO) test $(GOFLAGS) -race -count=1 -run "$(RUN)" ./...
 
 .PHONY: cover
 cover: ## Run tests with coverage and print a per-function summary
