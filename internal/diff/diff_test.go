@@ -1,19 +1,28 @@
 package diff
 
-import "testing"
+import (
+	"testing"
 
-func TestPlaceholder(t *testing.T) {
+	"github.com/steamedbuns/go-diff/internal/diff/edit"
+)
+
+func TestLCS(t *testing.T) {
 	tests := []struct {
-		name string
-		want string
+		name   string
+		inputA []string
+		inputB []string
+		want   []edit.EditNode
 	}{
-		{name: "Placeholder", want: "hello world"},
+		{name: "Placeholder", inputA: []string{"a", "b", "c"}, inputB: []string{}, want: []edit.EditNode{
+			{Content: "a", Op: edit.Remove},
+			{Content: "b", Op: edit.Remove},
+			{Content: "c", Op: edit.Remove}}},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := Placeholder()
-			if got != tc.want {
-				t.Errorf("Placeholder() = %v, want %v", got, tc.want)
+			got := LCS(tc.inputA, tc.inputB)
+			if len(got) != len(tc.want) {
+				t.Errorf("LCS(%v,%v) = %v, want %v", tc.inputA, tc.inputB, got, tc.want)
 			}
 		})
 	}
