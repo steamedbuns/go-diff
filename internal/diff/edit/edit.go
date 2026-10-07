@@ -23,9 +23,9 @@ const (
 	// NoChange marks a line present in both files. It is the zero value.
 	NoChange Op = iota
 	// Add marks a line present only in the new file.
-	Add
+	AddLine
 	// Remove marks a line present only in the old file.
-	Remove
+	RemoveLine
 )
 
 // String returns the constant's name, for debugging and test output.
@@ -34,11 +34,23 @@ func (op Op) String() string {
 	switch op {
 	case NoChange:
 		return "NoChange"
-	case Add:
-		return "Add"
-	case Remove:
-		return "Remove"
+	case AddLine:
+		return "AddLine"
+	case RemoveLine:
+		return "RemoveLine"
 	default:
 		return fmt.Sprintf("Unknown LineOperation(%d)", int(op))
 	}
+}
+
+func Keep(s string) Node {
+	return Node{Content: s, Op: NoChange}
+}
+
+func Add(s string) Node {
+	return Node{Content: s, Op: AddLine}
+}
+
+func Remove(s string) Node {
+	return Node{Content: s, Op: RemoveLine}
 }

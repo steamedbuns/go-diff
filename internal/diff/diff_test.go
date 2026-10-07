@@ -6,19 +6,26 @@ import (
 	"github.com/steamedbuns/go-diff/internal/diff/edit"
 )
 
+var lcsTests = []struct {
+	name   string
+	inputA []string
+	inputB []string
+	want   []edit.Node
+}{
+	{
+		name:   "Placeholder",
+		inputA: []string{"a", "b", "c"},
+		inputB: []string{},
+		want: []edit.Node{
+			edit.Remove("a"),
+			edit.Remove("b"),
+			edit.Remove("c"),
+		},
+	},
+}
+
 func TestLCS(t *testing.T) {
-	tests := []struct {
-		name   string
-		inputA []string
-		inputB []string
-		want   []edit.Node
-	}{
-		{name: "Placeholder", inputA: []string{"a", "b", "c"}, inputB: []string{}, want: []edit.Node{
-			{Content: "a", Op: edit.Remove},
-			{Content: "b", Op: edit.Remove},
-			{Content: "c", Op: edit.Remove}}},
-	}
-	for _, tc := range tests {
+	for _, tc := range lcsTests {
 		t.Run(tc.name, func(t *testing.T) {
 			got := LCS(tc.inputA, tc.inputB)
 			if len(got) != len(tc.want) {

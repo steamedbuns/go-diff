@@ -11,8 +11,8 @@ func TestLineOperationString(t *testing.T) {
 		want string
 	}{
 		{name: "NoChange", in: NoChange, want: "NoChange"},
-		{name: "Add", in: Add, want: "Add"},
-		{name: "Remove", in: Remove, want: "Remove"},
+		{name: "Add", in: AddLine, want: "AddLine"},
+		{name: "Remove", in: RemoveLine, want: "RemoveLine"},
 		{name: "Default", in: Op(12), want: "Unknown LineOperation(12)"},
 	}
 	for _, tc := range tests {
