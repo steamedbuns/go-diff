@@ -11,15 +11,15 @@ func TestLineOperationString(t *testing.T) {
 		want string
 	}{
 		{name: "NoChange", in: NoChange, want: "NoChange"},
-		{name: "Add", in: Add, want: "LineAdded"},
-		{name: "Remove", in: Remove, want: "LineRemoved"},
+		{name: "Add", in: Add, want: "Add"},
+		{name: "Remove", in: Remove, want: "Remove"},
 		{name: "Default", in: LineOperation(12), want: "Unknown LineOperation(12)"},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			got := tc.in.String()
 			if got != tc.want {
-				t.Errorf("LineOperation.String(%v) = %v, want %v", tc.in, got, tc.want)
+				t.Errorf("LineOperation.String(%v) = %v, want %v", int(tc.in), got, tc.want)
 			}
 		})
 	}

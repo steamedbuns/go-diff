@@ -17,9 +17,9 @@ func (op LineOperation) String() string {
 	case NoChange:
 		return "NoChange"
 	case Add:
-		return "LineAdded"
+		return "Add"
 	case Remove:
-		return "LineRemoved"
+		return "Remove"
 	default:
 		return fmt.Sprintf("Unknown LineOperation(%d)", int(op))
 	}
