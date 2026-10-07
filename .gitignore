@@ -35,3 +35,6 @@ go.work.sum
 # Build output
 /bin/
 /dist/
+
+# Learning tool
+.vibe-wise/
