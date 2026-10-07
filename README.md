@@ -12,7 +12,7 @@ go-diff/
 ├── internal/
 │   ├── cli/                # flag parsing, argument validation, file I/O, wiring
 │   ├── diff/               # diff pipeline: LCS(a, b) / Myers(a, b), no I/O
-│   │   ├── edit/           # shared edit-script types: EditNode, EditOp
+│   │   ├── edit/           # shared edit-script types: Node, Op
 │   │   ├── lcs/            # raw LCS pass (planned)
 │   │   ├── normalize/      # groups removes before adds in each change block (planned)
 │   │   ├── myers/          # raw Myers pass (planned)
@@ -25,7 +25,7 @@ go-diff/
 ```
 
 Each diff algorithm runs as a pipeline: a raw algorithm pass produces an edit
-script (`[]edit.EditNode`), and `normalize` reorders it so that, in each
+script (`[]edit.Node`), and `normalize` reorders it so that, in each
 contiguous block of changes, removed lines come before added lines (the
 git / GNU diff convention). Every step is its own package with its own tests.
 All `diff` sub-packages depend on `edit`, and `edit` depends on nothing else in
