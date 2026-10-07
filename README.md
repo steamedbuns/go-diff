@@ -10,15 +10,26 @@ go-diff/
 ├── cmd/
 │   └── go-diff/            # package main — entry point; keep it thin
 ├── internal/
-│   ├── cli/                # flag parsing, argument validation, wiring
-│   ├── diff/               # core diff algorithm (e.g. Myers / LCS), no I/O
+│   ├── cli/                # flag parsing, argument validation, file I/O, wiring
+│   ├── diff/               # diff pipeline: LCS(a, b) / Myers(a, b), no I/O
+│   │   ├── edit/           # shared edit-script types: EditNode, EditOp
+│   │   ├── lcs/            # raw LCS pass (planned)
+│   │   ├── normalize/      # groups removes before adds in each change block (planned)
+│   │   ├── myers/          # raw Myers pass (planned)
 │   │   └── testdata/       # fixture files used by tests (ignored by go build)
 │   └── render/             # output formats (unified, side-by-side, ...)
 ├── bin/                    # build output (git-ignored)
 ├── Makefile
-├── go.mod                  # create with `go mod init` (see below)
+├── go.mod
 └── README.md
 ```
+
+Each diff algorithm runs as a pipeline: a raw algorithm pass produces an edit
+script (`[]edit.EditNode`), and `normalize` reorders it so that, in each
+contiguous block of changes, removed lines come before added lines (the
+git / GNU diff convention). Every step is its own package with its own tests.
+All `diff` sub-packages depend on `edit`, and `edit` depends on nothing else in
+the module, so there are no import cycles.
 
 Conventions followed:
 
@@ -84,6 +95,7 @@ All common tasks are in the `Makefile`. Run `make` or `make help` to list them.
 | `make install`    | Install `go-diff` into `$GOBIN`                         |
 | `make run ARGS=…` | Build and run, e.g. `make run ARGS="a.txt b.txt"`       |
 | `make test`       | Run all tests with the race detector                    |
+| `make test RUN=…` | Run only tests matching a regex, e.g. `RUN=TestLineOperationString` |
 | `make cover`      | Run tests with coverage and print a summary             |
 | `make cover-html` | Open the HTML coverage report                           |
 | `make bench`      | Run benchmarks                                          |
@@ -99,7 +111,19 @@ declare `var version = "dev"` in package `main`.
 
 ## Usage
 
-_TODO_
+> **Status:** in progress. The `edit` types are done. The LCS pipeline, the
+> renderer, and the command-line entry point are not built yet, so there is no
+> working binary.
+
+Planned interface:
+
+```bash
+go-diff [--lcs] FILE1 FILE2
+```
+
+- The LCS algorithm is the default until Myers is implemented. After that,
+  Myers becomes the default and `--lcs` selects LCS.
+- The output format and exit codes are not decided yet.
 
 ## License
 
