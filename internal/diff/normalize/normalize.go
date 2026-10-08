@@ -12,7 +12,7 @@ func EditNodeGrouping(nodes []edit.Node) []edit.Node {
 			if changeChunk {
 				changeChunk = !changeChunk
 				normalized = append(normalized, addNodes...)
-				addNodes = []edit.Node{}
+				addNodes = addNodes[:0]
 			}
 			normalized = append(normalized, node)
 		case edit.AddLine:
