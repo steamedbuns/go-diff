@@ -7,7 +7,7 @@ import (
 	"github.com/steamedbuns/go-diff/internal/diff/edit"
 )
 
-var applyRemoveLinePriorityTests = []struct {
+var editNodeGroupingTests = []struct {
 	name string
 	in   []edit.Node
 	want []edit.Node
@@ -63,10 +63,10 @@ var applyRemoveLinePriorityTests = []struct {
 	},
 }
 
-func TestApplyRemoveLinePriority(t *testing.T) {
-	for _, tc := range applyRemoveLinePriorityTests {
+func TestEditNodeGrouping(t *testing.T) {
+	for _, tc := range editNodeGroupingTests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := ApplyRemoveLinePriority(tc.in)
+			got := EditNodeGrouping(tc.in)
 			if !slices.Equal(got, tc.want) {
 				t.Errorf("ApplyRemoveLinePriority(%v) = %v, want %v", tc.in, got, tc.want)
 			}
@@ -74,11 +74,11 @@ func TestApplyRemoveLinePriority(t *testing.T) {
 	}
 }
 
-func TestApplyRemoveLinePriorityIdempotent(t *testing.T) {
-	for _, tc := range applyRemoveLinePriorityTests {
+func TestEditNodeGroupingIdempotent(t *testing.T) {
+	for _, tc := range editNodeGroupingTests {
 		t.Run(tc.name, func(t *testing.T) {
-			once := ApplyRemoveLinePriority(tc.in)
-			twice := ApplyRemoveLinePriority(once)
+			once := EditNodeGrouping(tc.in)
+			twice := EditNodeGrouping(once)
 			if !slices.Equal(once, twice) {
 				t.Errorf("ApplyRemoveLinePriority applied twice to %v = %v, want %v", tc.in, twice, once)
 			}

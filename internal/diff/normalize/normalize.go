@@ -2,7 +2,7 @@ package normalize
 
 import "github.com/steamedbuns/go-diff/internal/diff/edit"
 
-func ApplyRemoveLinePriority(nodes []edit.Node) []edit.Node {
+func EditNodeGrouping(nodes []edit.Node) []edit.Node {
 	addNodes := []edit.Node{}
 	normalized := make([]edit.Node, len(nodes))[:0]
 	changeChunk := false
