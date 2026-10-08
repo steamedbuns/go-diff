@@ -7,7 +7,7 @@ import (
 	"github.com/steamedbuns/go-diff/internal/diff/edit"
 )
 
-var editNodeGroupingTests = []struct {
+var groupEditNodesTests = []struct {
 	name string
 	in   []edit.Node
 	want []edit.Node
@@ -63,10 +63,10 @@ var editNodeGroupingTests = []struct {
 	},
 }
 
-func TestEditNodeGrouping(t *testing.T) {
-	for _, tc := range editNodeGroupingTests {
+func TestGroupEditNodes(t *testing.T) {
+	for _, tc := range groupEditNodesTests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := EditNodeGrouping(tc.in)
+			got := GroupEditNodes(tc.in)
 			if !slices.Equal(got, tc.want) {
 				t.Errorf("ApplyRemoveLinePriority(%v) = %v, want %v", tc.in, got, tc.want)
 			}
@@ -74,11 +74,11 @@ func TestEditNodeGrouping(t *testing.T) {
 	}
 }
 
-func TestEditNodeGroupingIdempotent(t *testing.T) {
-	for _, tc := range editNodeGroupingTests {
+func TestGroupEditNodesIdempotent(t *testing.T) {
+	for _, tc := range groupEditNodesTests {
 		t.Run(tc.name, func(t *testing.T) {
-			once := EditNodeGrouping(tc.in)
-			twice := EditNodeGrouping(once)
+			once := GroupEditNodes(tc.in)
+			twice := GroupEditNodes(once)
 			if !slices.Equal(once, twice) {
 				t.Errorf("ApplyRemoveLinePriority applied twice to %v = %v, want %v", tc.in, twice, once)
 			}

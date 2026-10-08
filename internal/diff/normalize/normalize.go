@@ -2,7 +2,7 @@ package normalize
 
 import "github.com/steamedbuns/go-diff/internal/diff/edit"
 
-func EditNodeGrouping(nodes []edit.Node) []edit.Node {
+func GroupEditNodes(nodes []edit.Node) []edit.Node {
 	addNodes := make([]edit.Node, len(nodes))[:0]
 	normalized := make([]edit.Node, len(nodes))[:0]
 	changeChunk := false
