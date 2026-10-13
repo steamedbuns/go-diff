@@ -12,7 +12,7 @@ var tokenizeTests = []struct {
 	input []string
 	want  []int
 }{
-	{"empty", []string{}, []int{}},
+	{"empty", []string{}, nil},
 	{"same data", []string{"a", "a", "a"}, []int{0, 0, 0}},
 	{"different data", []string{"a", "b", "c"}, []int{0, 1, 2}},
 	{"data shuffle", []string{"a", "b", "a", "c"}, []int{0, 1, 0, 2}},
