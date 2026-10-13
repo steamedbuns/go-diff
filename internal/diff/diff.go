@@ -12,6 +12,13 @@ type TokenMap struct {
 	dataTable       []string
 }
 
+func NewTokenMap() *TokenMap {
+	return &TokenMap{
+		seed:            maphash.MakeSeed(),
+		hashToTokensMap: make(map[uint64][]int),
+	}
+}
+
 func (tm *TokenMap) Tokenize(input []string) []int {
 	return []int{}
 }
