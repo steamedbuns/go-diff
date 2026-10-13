@@ -54,3 +54,34 @@ func Add(s string) Node {
 func Remove(s string) Node {
 	return Node{Content: s, Op: RemoveLine}
 }
+
+func Normalize(nodes []Node) []Node {
+	normalized := make([]Node, len(nodes))[:0]
+	addNodes := make([]Node, len(nodes))[:0]
+	changeChunk := false
+	for _, node := range nodes {
+		switch node.Op {
+		case NoChange:
+			if changeChunk {
+				changeChunk = !changeChunk
+				normalized = append(normalized, addNodes...)
+				addNodes = addNodes[:0]
+			}
+			normalized = append(normalized, node)
+		case AddLine:
+			if !changeChunk {
+				changeChunk = !changeChunk
+			}
+			addNodes = append(addNodes, node)
+		case RemoveLine:
+			if !changeChunk {
+				changeChunk = !changeChunk
+			}
+			normalized = append(normalized, node)
+		}
+	}
+	if len(addNodes) > 0 {
+		normalized = append(normalized, addNodes...)
+	}
+	return normalized
+}

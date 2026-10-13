@@ -1,6 +1,7 @@
 package edit
 
 import (
+	"slices"
 	"testing"
 )
 
@@ -40,6 +41,85 @@ func TestNodeHelperFunction(t *testing.T) {
 			got := tc.callFunc(tc.name)
 			if got != tc.want {
 				t.Errorf("%v(%v) = %v, want %v", tc.name, tc.name, got, tc.want)
+			}
+		})
+	}
+}
+
+var normalizeTests = []struct {
+	name string
+	in   []Node
+	want []Node
+}{
+	{name: "empty", in: []Node{}, want: []Node{}},
+	{name: "nil", in: nil, want: []Node{}},
+	{
+		name: "only unchanged",
+		in:   []Node{Keep("a"), Keep("b")},
+		want: []Node{Keep("a"), Keep("b")},
+	},
+	{name: "single add", in: []Node{Add("a")}, want: []Node{Add("a")}},
+	{name: "single remove", in: []Node{Remove("a")}, want: []Node{Remove("a")}},
+	{
+		name: "already ordered",
+		in:   []Node{Remove("a"), Remove("b"), Add("x"), Add("y")},
+		want: []Node{Remove("a"), Remove("b"), Add("x"), Add("y")},
+	},
+	{
+		name: "add before remove",
+		in:   []Node{Add("x"), Remove("a")},
+		want: []Node{Remove("a"), Add("x")},
+	},
+	{
+		name: "interleaved keeps relative order",
+		in:   []Node{Add("x"), Remove("a"), Add("y"), Remove("b")},
+		want: []Node{Remove("a"), Remove("b"), Add("x"), Add("y")},
+	},
+	{
+		name: "block in the middle",
+		in:   []Node{Keep("k"), Add("x"), Remove("a"), Keep("m")},
+		want: []Node{Keep("k"), Remove("a"), Add("x"), Keep("m")},
+	},
+	{
+		name: "blocks at start and end",
+		in:   []Node{Add("x"), Remove("a"), Keep("k"), Add("y"), Remove("b")},
+		want: []Node{Remove("a"), Add("x"), Keep("k"), Remove("b"), Add("y")},
+	},
+	{
+		name: "remove does not cross unchanged line",
+		in:   []Node{Add("x"), Keep("k"), Remove("a")},
+		want: []Node{Add("x"), Keep("k"), Remove("a")},
+	},
+	{
+		name: "only adds keep order",
+		in:   []Node{Add("x"), Add("y"), Add("z")},
+		want: []Node{Add("x"), Add("y"), Add("z")},
+	},
+	{
+		name: "only removes keep order",
+		in:   []Node{Remove("a"), Remove("b"), Remove("c")},
+		want: []Node{Remove("a"), Remove("b"), Remove("c")},
+	},
+}
+
+func TestNormalize(t *testing.T) {
+	for _, tc := range normalizeTests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := Normalize(tc.in)
+			if !slices.Equal(got, tc.want) {
+				t.Errorf("Normalize(%v) = %v, want %v", tc.in, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestNormalizeIdempotent(t *testing.T) {
+	for _, tc := range normalizeTests {
+		t.Run(tc.name, func(t *testing.T) {
+			once := Normalize(tc.in)
+			twice := Normalize(once)
+			if !slices.Equal(once, twice) {
+				t.Errorf("Normalize applied twice to %v = %v, want %v", tc.in, twice, once)
 			}
 		})
 	}
