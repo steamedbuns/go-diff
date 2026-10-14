@@ -2,8 +2,6 @@ package diff
 
 import (
 	"hash/maphash"
-
-	"github.com/steamedbuns/go-diff/internal/diff/edit"
 )
 
 // TokenMap creates a mapping from uint64 hash of a string to a bucket of integer tokens.
@@ -52,10 +50,6 @@ func (tm *TokenMap) Tokenize(input []string) []int {
 	return tokens
 }
 
-func LCS(inputA, inputB []string) []edit.Node {
-	return []edit.Node{
-		edit.Remove("a"),
-		edit.Remove("b"),
-		edit.Remove("c"),
-	}
+func LCS(inputA, inputB []int) int {
+	return 0
 }
