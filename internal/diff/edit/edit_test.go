@@ -29,16 +29,17 @@ func TestLineOperationString(t *testing.T) {
 func TestNodeHelperFunction(t *testing.T) {
 	tests := []struct {
 		name     string
-		callFunc func(s string) Node
+		input    int
+		callFunc func(t int) Node
 		want     Node
 	}{
-		{name: "Keep", callFunc: Keep, want: Node{Content: "Keep", Op: NoChange}},
-		{name: "Add", callFunc: Add, want: Node{Content: "Add", Op: AddLine}},
-		{name: "Remove", callFunc: Remove, want: Node{Content: "Remove", Op: RemoveLine}},
+		{name: "Keep", input: 0, callFunc: Keep, want: Node{Token: 0, Op: NoChange}},
+		{name: "Add", input: 1, callFunc: Add, want: Node{Token: 1, Op: AddLine}},
+		{name: "Remove", input: 2, callFunc: Remove, want: Node{Token: 2, Op: RemoveLine}},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := tc.callFunc(tc.name)
+			got := tc.callFunc(tc.input)
 			if got != tc.want {
 				t.Errorf("%v(%v) = %v, want %v", tc.name, tc.name, got, tc.want)
 			}
@@ -55,50 +56,50 @@ var normalizeTests = []struct {
 	{name: "nil", in: nil, want: []Node{}},
 	{
 		name: "only unchanged",
-		in:   []Node{Keep("a"), Keep("b")},
-		want: []Node{Keep("a"), Keep("b")},
+		in:   []Node{Keep(0), Keep(1)},
+		want: []Node{Keep(0), Keep(1)},
 	},
-	{name: "single add", in: []Node{Add("a")}, want: []Node{Add("a")}},
-	{name: "single remove", in: []Node{Remove("a")}, want: []Node{Remove("a")}},
+	{name: "single add", in: []Node{Add(0)}, want: []Node{Add(0)}},
+	{name: "single remove", in: []Node{Remove(0)}, want: []Node{Remove(0)}},
 	{
 		name: "already ordered",
-		in:   []Node{Remove("a"), Remove("b"), Add("x"), Add("y")},
-		want: []Node{Remove("a"), Remove("b"), Add("x"), Add("y")},
+		in:   []Node{Remove(0), Remove(1), Add(2), Add(3)},
+		want: []Node{Remove(0), Remove(1), Add(2), Add(3)},
 	},
 	{
 		name: "add before remove",
-		in:   []Node{Add("x"), Remove("a")},
-		want: []Node{Remove("a"), Add("x")},
+		in:   []Node{Add(10), Remove(20)},
+		want: []Node{Remove(20), Add(10)},
 	},
 	{
 		name: "interleaved keeps relative order",
-		in:   []Node{Add("x"), Remove("a"), Add("y"), Remove("b")},
-		want: []Node{Remove("a"), Remove("b"), Add("x"), Add("y")},
+		in:   []Node{Add(10), Remove(20), Add(30), Remove(40)},
+		want: []Node{Remove(20), Remove(40), Add(10), Add(30)},
 	},
 	{
 		name: "block in the middle",
-		in:   []Node{Keep("k"), Add("x"), Remove("a"), Keep("m")},
-		want: []Node{Keep("k"), Remove("a"), Add("x"), Keep("m")},
+		in:   []Node{Keep(100), Add(10), Remove(20), Keep(200)},
+		want: []Node{Keep(100), Remove(20), Add(10), Keep(200)},
 	},
 	{
 		name: "blocks at start and end",
-		in:   []Node{Add("x"), Remove("a"), Keep("k"), Add("y"), Remove("b")},
-		want: []Node{Remove("a"), Add("x"), Keep("k"), Remove("b"), Add("y")},
+		in:   []Node{Add(10), Remove(20), Keep(100), Add(30), Remove(40)},
+		want: []Node{Remove(20), Add(10), Keep(100), Remove(40), Add(30)},
 	},
 	{
 		name: "remove does not cross unchanged line",
-		in:   []Node{Add("x"), Keep("k"), Remove("a")},
-		want: []Node{Add("x"), Keep("k"), Remove("a")},
+		in:   []Node{Add(10), Keep(100), Remove(20)},
+		want: []Node{Add(10), Keep(100), Remove(20)},
 	},
 	{
 		name: "only adds keep order",
-		in:   []Node{Add("x"), Add("y"), Add("z")},
-		want: []Node{Add("x"), Add("y"), Add("z")},
+		in:   []Node{Add(10), Add(20), Add(30)},
+		want: []Node{Add(10), Add(20), Add(30)},
 	},
 	{
 		name: "only removes keep order",
-		in:   []Node{Remove("a"), Remove("b"), Remove("c")},
-		want: []Node{Remove("a"), Remove("b"), Remove("c")},
+		in:   []Node{Remove(10), Remove(20), Remove(30)},
+		want: []Node{Remove(10), Remove(20), Remove(30)},
 	},
 }
 
