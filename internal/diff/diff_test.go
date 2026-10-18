@@ -3,6 +3,8 @@ package diff
 import (
 	"slices"
 	"testing"
+
+	"github.com/steamedbuns/go-diff/internal/diff/edit"
 )
 
 var tokenizeTests = []struct {
@@ -28,28 +30,28 @@ func TestTokenize(t *testing.T) {
 	}
 }
 
-var lcsTests = []struct {
+var diffLcsTests = []struct {
 	name   string
 	inputA []int
 	inputB []int
-	want   []int
+	want   []edit.Node
 }{
-	{"both empty", []int{}, []int{}, []int{}},
-	{"inputA empty", []int{}, []int{1, 2, 3, 4}, []int{}},
-	{"inputB empty", []int{1, 2, 3, 4}, []int{}, []int{}},
-	{"all equal", []int{1, 2, 3, 4}, []int{1, 2, 3, 4}, []int{1, 2, 3, 4}},
-	{"start equal", []int{1, 2, 5, 5}, []int{1, 2, 6, 6}, []int{1, 2}},
-	{"end equal", []int{5, 5, 1, 2}, []int{6, 6, 1, 2}, []int{1, 2}},
-	{"middle equal", []int{5, 1, 2, 5}, []int{6, 1, 2, 6}, []int{1, 2}},
-	{"multiple equal", []int{1, 2, 5, 5, 5, 6, 7, 8}, []int{1, 2, 4, 4, 6, 7, 8}, []int{1, 2, 6, 7, 8}},
+	{"both empty", []int{}, []int{}, []edit.Node{}},
+	{"inputA empty", []int{}, []int{1, 2, 3, 4}, []edit.Node{edit.Add(1), edit.Add(2), edit.Add(3), edit.Add(4)}},
+	{"inputB empty", []int{1, 2, 3, 4}, []int{}, []edit.Node{edit.Remove(1), edit.Remove(2), edit.Remove(3), edit.Remove(4)}},
+	{"all equal", []int{1, 2, 3, 4}, []int{1, 2, 3, 4}, []edit.Node{edit.Keep(1), edit.Keep(2), edit.Keep(3), edit.Keep(4)}},
+	{"start equal", []int{1, 2, 5, 5}, []int{1, 2, 6, 6}, []edit.Node{edit.Keep(1), edit.Keep(2), edit.Remove(5), edit.Remove(5), edit.Add(6), edit.Add(6)}},
+	{"end equal", []int{5, 5, 1, 2}, []int{6, 6, 1, 2}, []edit.Node{edit.Remove(5), edit.Remove(5), edit.Add(6), edit.Add(6), edit.Keep(1), edit.Keep(2)}},
+	{"middle equal", []int{5, 1, 2, 5}, []int{6, 1, 2, 6}, []edit.Node{edit.Remove(5), edit.Add(6), edit.Keep(1), edit.Keep(2), edit.Remove(5), edit.Add(6)}},
+	{"multiple equal", []int{1, 2, 5, 5, 5, 6, 7, 8}, []int{1, 2, 4, 4, 6, 7, 8}, []edit.Node{edit.Keep(1), edit.Keep(2), edit.Remove(5), edit.Remove(5), edit.Remove(5), edit.Add(4), edit.Add(4), edit.Keep(6), edit.Keep(7), edit.Keep(8)}},
 }
 
-func TestLCS(t *testing.T) {
-	for _, tc := range lcsTests {
+func TestDiffLcs(t *testing.T) {
+	for _, tc := range diffLcsTests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := LCS(tc.inputA, tc.inputB)
+			got := DiffLcs(tc.inputA, tc.inputB)
 			if !slices.Equal(got, tc.want) {
-				t.Errorf("LCS(%v, %v) = %v, want %v", tc.inputA, tc.inputB, got, tc.want)
+				t.Errorf("DiffLcs(%v, %v) =\ngot  %v\nwant %v", tc.inputA, tc.inputB, got, tc.want)
 			}
 		})
 	}

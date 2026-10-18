@@ -3,6 +3,8 @@ package diff
 import (
 	"hash/maphash"
 	"slices"
+
+	"github.com/steamedbuns/go-diff/internal/diff/edit"
 )
 
 // TokenMap creates a mapping from uint64 hash of a string to a bucket of integer tokens.
@@ -51,7 +53,7 @@ func (tm *TokenMap) Tokenize(input []string) []int {
 	return tokens
 }
 
-func LCS(inputA, inputB []int) []int {
+func DiffLcs(inputA, inputB []int) []edit.Node {
 	lcsGrid := make([][]int, len(inputA)+1)
 	for i := range lcsGrid {
 		lcsGrid[i] = make([]int, len(inputB)+1)
@@ -62,24 +64,34 @@ func LCS(inputA, inputB []int) []int {
 			if inputA[i-1] == inputB[j-1] {
 				lcsGrid[i][j] = lcsGrid[i-1][j-1] + 1
 			} else {
-				lcsGrid[i][j] = max(lcsGrid[i][j-1], lcsGrid[i-1][j])
+				lcsGrid[i][j] = max(lcsGrid[i-1][j], lcsGrid[i][j-1])
 			}
 		}
 	}
 
-	lcs := []int{}
+	diff := []edit.Node{}
 	i, j := len(inputA), len(inputB)
 	for i > 0 && j > 0 {
 		if inputA[i-1] == inputB[j-1] {
-			lcs = append(lcs, inputA[i-1])
+			diff = append(diff, edit.Keep(inputA[i-1]))
 			i--
 			j--
 		} else if lcsGrid[i-1][j] > lcsGrid[i][j-1] {
+			diff = append(diff, edit.Remove(inputA[i-1]))
 			i--
 		} else {
+			diff = append(diff, edit.Add(inputB[j-1]))
 			j--
 		}
 	}
-	slices.Reverse(lcs)
-	return lcs
+	for i > 0 {
+		diff = append(diff, edit.Remove(inputA[i-1]))
+		i--
+	}
+	for j > 0 {
+		diff = append(diff, edit.Add(inputB[j-1]))
+		j--
+	}
+	slices.Reverse(diff)
+	return diff
 }
