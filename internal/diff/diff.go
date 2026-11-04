@@ -2,28 +2,29 @@ package diff
 
 import (
 	"hash/maphash"
+	"slices"
 
 	"github.com/steamedbuns/go-diff/internal/diff/edit"
 )
 
-// TokenMap creates a mapping from uint64 hash of a string to a bucket of integer tokens.
+// tokenMap creates a mapping from uint64 hash of a string to a bucket of integer tokens.
 // The tokens represent the index location of a string inside the tokenTable.
 // The tokenTable is a slice that holds unique strings, the index is the token.
 // Each token index maps 1 to 1 to a unique string.
-type TokenMap struct {
+type tokenMap struct {
 	seed            maphash.Seed
 	hashToBucketMap map[uint64][]int
 	tokenTable      []string
 }
 
-func NewTokenMap() *TokenMap {
-	return &TokenMap{
+func newTokenMap() *tokenMap {
+	return &tokenMap{
 		seed:            maphash.MakeSeed(),
 		hashToBucketMap: make(map[uint64][]int),
 	}
 }
 
-func (tm *TokenMap) getToken(line string) int {
+func (tm *tokenMap) getToken(line string) int {
 	h := maphash.String(tm.seed, line)
 	if bucket, found := tm.hashToBucketMap[h]; found {
 		for _, token := range bucket {
@@ -41,7 +42,7 @@ func (tm *TokenMap) getToken(line string) int {
 // Transforms the input into a slice of integers
 // The integers represent an integer token that points to the string in the input slice
 // If two strings are equal in the input, that will map to the same integer token
-func (tm *TokenMap) Tokenize(input []string) []int {
+func (tm *tokenMap) tokenize(input []string) []int {
 	if len(input) == 0 {
 		return nil
 	}
@@ -52,10 +53,70 @@ func (tm *TokenMap) Tokenize(input []string) []int {
 	return tokens
 }
 
-func LCS(inputA, inputB []string) []edit.Node {
-	return []edit.Node{
-		edit.Remove("a"),
-		edit.Remove("b"),
-		edit.Remove("c"),
+func lcs(inputA, inputB []int) []edit.Node {
+	lcsGrid := make([][]int, len(inputA)+1)
+	for i := range lcsGrid {
+		lcsGrid[i] = make([]int, len(inputB)+1)
+	}
+
+	for i := 1; i <= len(inputA); i++ {
+		for j := 1; j <= len(inputB); j++ {
+			if inputA[i-1] == inputB[j-1] {
+				lcsGrid[i][j] = lcsGrid[i-1][j-1] + 1
+			} else {
+				lcsGrid[i][j] = max(lcsGrid[i-1][j], lcsGrid[i][j-1])
+			}
+		}
+	}
+
+	diff := []edit.Node{}
+	i, j := len(inputA), len(inputB)
+	for i > 0 && j > 0 {
+		if inputA[i-1] == inputB[j-1] {
+			diff = append(diff, edit.Keep(inputA[i-1]))
+			i--
+			j--
+		} else if lcsGrid[i-1][j] > lcsGrid[i][j-1] {
+			diff = append(diff, edit.Remove(inputA[i-1]))
+			i--
+		} else {
+			diff = append(diff, edit.Add(inputB[j-1]))
+			j--
+		}
+	}
+	for i > 0 {
+		diff = append(diff, edit.Remove(inputA[i-1]))
+		i--
+	}
+	for j > 0 {
+		diff = append(diff, edit.Add(inputB[j-1]))
+		j--
+	}
+	slices.Reverse(diff)
+	return diff
+}
+
+// Script is an edit script together with the line text its tokens refer to.
+type Script struct {
+	Nodes []edit.Node
+	lines []string
+}
+
+// Text returns the line text for n.
+func (s Script) Text(n edit.Node) string {
+	return s.lines[n.Token]
+}
+
+// LCS returns the edit script that turns old into new.
+func LCS(oldLines, newLines []string) Script {
+	tm := newTokenMap()
+	tokensOld := tm.tokenize(oldLines)
+	tokensNew := tm.tokenize(newLines)
+
+	editNodes := lcs(tokensOld, tokensNew)
+
+	return Script{
+		Nodes: editNodes,
+		lines: tm.tokenTable,
 	}
 }

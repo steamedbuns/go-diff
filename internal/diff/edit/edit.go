@@ -10,8 +10,8 @@ import (
 // operation that transforms the old file into the new one at that point.
 // The zero value is an empty, unchanged line.
 type Node struct {
-	// Content is the text of the line, without its line terminator.
-	Content string
+	// Token is the int id that points to the text of the line.
+	Token int
 	// Op says whether the line is unchanged, added, or removed.
 	Op Op
 }
@@ -43,16 +43,16 @@ func (op Op) String() string {
 	}
 }
 
-func Keep(s string) Node {
-	return Node{Content: s, Op: NoChange}
+func Keep(t int) Node {
+	return Node{Token: t, Op: NoChange}
 }
 
-func Add(s string) Node {
-	return Node{Content: s, Op: AddLine}
+func Add(t int) Node {
+	return Node{Token: t, Op: AddLine}
 }
 
-func Remove(s string) Node {
-	return Node{Content: s, Op: RemoveLine}
+func Remove(t int) Node {
+	return Node{Token: t, Op: RemoveLine}
 }
 
 func Normalize(nodes []Node) []Node {
