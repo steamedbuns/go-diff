@@ -7,7 +7,7 @@ import (
 	"github.com/steamedbuns/go-diff/internal/diff/edit"
 )
 
-// TokenMap creates a mapping from uint64 hash of a string to a bucket of integer tokens.
+// tokenMap creates a mapping from uint64 hash of a string to a bucket of integer tokens.
 // The tokens represent the index location of a string inside the tokenTable.
 // The tokenTable is a slice that holds unique strings, the index is the token.
 // Each token index maps 1 to 1 to a unique string.
@@ -108,10 +108,10 @@ func (s Script) Text(n edit.Node) string {
 }
 
 // LCS returns the edit script that turns old into new.
-func LCS(old, new []string) Script {
+func LCS(oldLines, newLines []string) Script {
 	tm := newTokenMap()
-	tokensOld := tm.tokenize(old)
-	tokensNew := tm.tokenize(new)
+	tokensOld := tm.tokenize(oldLines)
+	tokensNew := tm.tokenize(newLines)
 
 	editNodes := lcs(tokensOld, tokensNew)
 
