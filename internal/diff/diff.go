@@ -95,3 +95,28 @@ func lcs(inputA, inputB []int) []edit.Node {
 	slices.Reverse(diff)
 	return diff
 }
+
+// Script is an edit script together with the line text its tokens refer to.
+type Script struct {
+	Nodes []edit.Node
+	lines []string
+}
+
+// Text returns the line text for n.
+func (s Script) Text(n edit.Node) string {
+	return s.lines[n.Token]
+}
+
+// LCS returns the edit script that turns old into new.
+func LCS(old, new []string) Script {
+	tm := newTokenMap()
+	tokensOld := tm.tokenize(old)
+	tokensNew := tm.tokenize(new)
+
+	editNodes := lcs(tokensOld, tokensNew)
+
+	return Script{
+		Nodes: editNodes,
+		lines: tm.tokenTable,
+	}
+}
