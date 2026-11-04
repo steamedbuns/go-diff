@@ -21,8 +21,8 @@ var tokenizeTests = []struct {
 func TestTokenize(t *testing.T) {
 	for _, tc := range tokenizeTests {
 		t.Run(tc.name, func(t *testing.T) {
-			tokenMap := NewTokenMap()
-			got := tokenMap.Tokenize(tc.input)
+			tokenMap := newTokenMap()
+			got := tokenMap.tokenize(tc.input)
 			if !slices.Equal(got, tc.want) {
 				t.Errorf("Tokenize(%v) = %v, want %v", tc.input, got, tc.want)
 			}
@@ -30,7 +30,7 @@ func TestTokenize(t *testing.T) {
 	}
 }
 
-var diffLcsTests = []struct {
+var lcsTests = []struct {
 	name   string
 	inputA []int
 	inputB []int
@@ -46,12 +46,12 @@ var diffLcsTests = []struct {
 	{"multiple equal", []int{1, 2, 5, 5, 5, 6, 7, 8}, []int{1, 2, 4, 4, 6, 7, 8}, []edit.Node{edit.Keep(1), edit.Keep(2), edit.Remove(5), edit.Remove(5), edit.Remove(5), edit.Add(4), edit.Add(4), edit.Keep(6), edit.Keep(7), edit.Keep(8)}},
 }
 
-func TestDiffLcs(t *testing.T) {
-	for _, tc := range diffLcsTests {
+func TestLcs(t *testing.T) {
+	for _, tc := range lcsTests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := DiffLcs(tc.inputA, tc.inputB)
+			got := lcs(tc.inputA, tc.inputB)
 			if !slices.Equal(got, tc.want) {
-				t.Errorf("DiffLcs(%v, %v) =\ngot  %v\nwant %v", tc.inputA, tc.inputB, got, tc.want)
+				t.Errorf("lcs(%v, %v) =\ngot  %v\nwant %v", tc.inputA, tc.inputB, got, tc.want)
 			}
 		})
 	}

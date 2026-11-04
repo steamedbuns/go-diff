@@ -11,20 +11,20 @@ import (
 // The tokens represent the index location of a string inside the tokenTable.
 // The tokenTable is a slice that holds unique strings, the index is the token.
 // Each token index maps 1 to 1 to a unique string.
-type TokenMap struct {
+type tokenMap struct {
 	seed            maphash.Seed
 	hashToBucketMap map[uint64][]int
 	tokenTable      []string
 }
 
-func NewTokenMap() *TokenMap {
-	return &TokenMap{
+func newTokenMap() *tokenMap {
+	return &tokenMap{
 		seed:            maphash.MakeSeed(),
 		hashToBucketMap: make(map[uint64][]int),
 	}
 }
 
-func (tm *TokenMap) getToken(line string) int {
+func (tm *tokenMap) getToken(line string) int {
 	h := maphash.String(tm.seed, line)
 	if bucket, found := tm.hashToBucketMap[h]; found {
 		for _, token := range bucket {
@@ -42,7 +42,7 @@ func (tm *TokenMap) getToken(line string) int {
 // Transforms the input into a slice of integers
 // The integers represent an integer token that points to the string in the input slice
 // If two strings are equal in the input, that will map to the same integer token
-func (tm *TokenMap) Tokenize(input []string) []int {
+func (tm *tokenMap) tokenize(input []string) []int {
 	if len(input) == 0 {
 		return nil
 	}
@@ -53,7 +53,7 @@ func (tm *TokenMap) Tokenize(input []string) []int {
 	return tokens
 }
 
-func DiffLcs(inputA, inputB []int) []edit.Node {
+func lcs(inputA, inputB []int) []edit.Node {
 	lcsGrid := make([][]int, len(inputA)+1)
 	for i := range lcsGrid {
 		lcsGrid[i] = make([]int, len(inputB)+1)
